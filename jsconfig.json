@@ -1,0 +1,13 @@
+
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/controllers/*": ["/src/controllers/*"],
+      "@/middleware/*": ["/src/middleware/*"],
+      "@/routes/*": ["/src/routes/*"],
+      "@/config/*": ["/src/config/*"],
+      "@/index": ["/src/index.tsx"],
+    }
+  }
+}
