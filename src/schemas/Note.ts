@@ -1,10 +1,5 @@
-import { Types, Schema, model } from "mongoose"
-
-interface INote {
-  note: string
-  createdAt: Date
-  user: Types.ObjectId
-}
+import { Schema, model } from "mongoose"
+import { INote } from "../interfaces/INote"
 
 const NoteSchema = new Schema<INote>({
   note: {

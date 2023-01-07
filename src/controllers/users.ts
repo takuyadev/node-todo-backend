@@ -36,7 +36,7 @@ exports.getUserById = asyncHandler(
 
 // @desc Create user
 // @route /:id
-// @access Public
+// @access Private: Admin
 
 exports.createUser = asyncHandler(
   async (req: Request, res: Response, _next: NextFunction) => {

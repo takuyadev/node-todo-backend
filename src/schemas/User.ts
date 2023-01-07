@@ -11,14 +11,17 @@ interface IUser extends Document {
   createdAt: Date
 }
 
-const UserSchema = new Schema({
+const UserSchema = new Schema<IUser>({
   username: {
     type: String,
     required: [true, "Please add a username"],
+    min: [6, "Please try a longer username"],
+    max: [24, "Please try a shorter username"],
   },
   email: {
     type: String,
     required: [true, "Please add a email"],
+    max: [320, "Please try a shorter email address"],
     unique: true,
     match: [
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -28,6 +31,8 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: [true, "Please add a password"],
+    min: [8, "Please try a longer password"],
+    max: [64, "Please try a shorter password"],
   },
   role: {
     type: String,
@@ -60,8 +65,8 @@ UserSchema.methods.generateToken = function () {
 }
 
 // Compare encrypted password and entered password when called
-UserSchema.method("matchPassword", async function (enteredPassword: string) {
+UserSchema.methods.matchPassword = async function (enteredPassword: string) {
   return bcrypt.compare(enteredPassword, this.password)
-})
+}
 
 module.exports = model<IUser>("User", UserSchema)
