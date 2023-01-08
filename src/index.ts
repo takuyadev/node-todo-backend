@@ -15,9 +15,9 @@ const hpp = require("hpp")
 const cors = require("cors")
 
 // Import users into the main server
-const users = require("./routes/users.ts")
-const notes = require("./routes/notes.ts")
-const auth = require("./routes/auth.ts")
+const users = require("./routes/users")
+const notes = require("./routes/notes")
+const auth = require("./routes/auth")
 const connect = require("./config/db")
 
 // Load Environment Variables

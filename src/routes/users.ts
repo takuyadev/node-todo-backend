@@ -5,7 +5,7 @@ const {
   getUserById,
   createUser,
   deleteUser,
-} = require("../controllers/users.ts")
+} = require("../controllers/users")
 
 const router = express.Router({ mergeParams: true })
 

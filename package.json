@@ -26,8 +26,9 @@
   "version": "1.0.0",
   "main": "./src/index.ts",
   "scripts": {
-    "start": "nodemon ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "nodemon ./src/index.ts",
+    "build": "rimraf ./build && tsc",
+    "start": "npm run build && node dist/index.js"
   },
   "repository": {
     "type": "git",

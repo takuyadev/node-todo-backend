@@ -10,7 +10,7 @@ const {
   updatePassword,
   forgotPassword,
   resetPassword,
-} = require("../controllers/auth.ts")
+} = require("../controllers/auth")
 const { verify, authenticate } = require("../middlewares/auth")
 const router = express.Router({ mergeParams: true })
 

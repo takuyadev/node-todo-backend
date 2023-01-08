@@ -7,7 +7,7 @@ const {
   createNote,
   updateNote,
   deleteNote,
-} = require("../controllers/notes.ts")
+} = require("../controllers/notes")
 const router = express.Router({ mergeParams: true })
 const { verify, authenticate, authorize } = require("../middlewares/auth")
 
