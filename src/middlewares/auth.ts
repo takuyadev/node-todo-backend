@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express"
-import { IUser } from "../interfaces/IUser"
+import { IUserWithId } from "../interfaces/IUser"
 const jwt = require("jsonwebtoken")
 const User = require("../schemas/User")
 const asyncHandler = require("../middlewares/async")
 
 interface UserRequest extends Request {
-  user: IUser
+  user: IUserWithId
 }
 
 // @desc Verifies user by checking provided token in header

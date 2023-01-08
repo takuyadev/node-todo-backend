@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express"
-import { IUser } from "../interfaces/IUser"
+import { IUserWithId } from "../interfaces/IUser"
 const asyncHandler = require("../middlewares/async")
 const Note = require("../schemas/Note")
 
 interface UserRequest extends Request {
-  user: IUser
+  user: IUserWithId
 }
 
 // @desc Get all personal notes

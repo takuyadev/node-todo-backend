@@ -1,17 +1,13 @@
 import { Schema, model, Document } from "mongoose"
+import { IUser } from "../interfaces/IUser"
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const crypto = require("crypto")
 
 // Typescript interface, extended from Document to prevent this = any
-interface IUser extends Document {
-  username: string
-  email: string
-  role: string
-  password: string
-  createdAt: Date
-}
+interface IUserSchema extends IUser, Document {}
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IUserSchema>({
   username: {
     type: String,
     required: [true, "Please add a username"],
@@ -39,6 +35,22 @@ const UserSchema = new Schema<IUser>({
     enum: ["user", "admin"],
     default: "user",
   },
+  isEmailConfirmed: {
+    type: Boolean,
+    default: false,
+  },
+  isEmailConfirmedToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpire: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -46,7 +58,7 @@ const UserSchema = new Schema<IUser>({
 })
 
 // Before saving, encrypt the password.
-UserSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUserSchema>("save", async function (next) {
   // If the password has already been encrypted / has not been modified:
   // Skip encrypting the password
 
@@ -60,13 +72,46 @@ UserSchema.pre<IUser>("save", async function (next) {
 // Generate token if called, ex. when logging in, registering
 UserSchema.methods.generateToken = function () {
   return jwt.sign({ _id: this._id }, `${process.env.JWT_SECRET}`, {
-    expiresIn: `${process.env.JWT_EXPIRE}`,
+    expiresIn: Number(process.env.JWT_EXPIRE) * 24 * 60 * 60,
   })
 }
 
 // Compare encrypted password and entered password when called
 UserSchema.methods.matchPassword = async function (enteredPassword: string) {
   return bcrypt.compare(enteredPassword, this.password)
+}
+
+// Generate reset password token, and set schema to reflect token expiration and authenticity
+UserSchema.methods.getPasswordToken = async function () {
+  // Generate unhashed reset token
+  const unhashedResetToken = crypto.randomBytes(20).toString("hex")
+
+  // Hash token and set new token to User schema
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(unhashedResetToken)
+    .digest("hex")
+
+  // Set expire and set new time to User schema
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
+
+  // Return token for usage
+  return unhashedResetToken
+}
+
+// Generate confirm email token, and set user schema to reflect isEmailConfirmed property
+UserSchema.methods.getEmailToken = async function () {
+  // Generate unhashed confirm token
+  const unhashedConfirmToken = crypto.randomBytes(20).toString("hex")
+
+  // Hash token and set token to User schema
+  this.isEmailConfirmedToken = crypto
+    .createHash("sha256")
+    .update(unhashedConfirmToken)
+    .digest("hex")
+
+  // Return token for usage
+  return unhashedConfirmToken
 }
 
 module.exports = model<IUser>("User", UserSchema)
