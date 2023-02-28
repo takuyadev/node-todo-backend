@@ -26,8 +26,7 @@
   "version": "1.0.0",
   "main": "./src/index.ts",
   "scripts": {
-    "start:dev": "nodemon ./src/index.ts",
-    "build": "npx tsc",
+    "dev": "nodemon ./src/index.ts",
     "start": "npm run build && node ./dist/index.js"
   },
   "repository": {

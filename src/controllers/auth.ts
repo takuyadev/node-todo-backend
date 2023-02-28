@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { IEmailParams } from "../interfaces/IEmailParams"
 import { IEmailResponse } from "../interfaces/IEmailResponse"
-import { IUser, IUserSchema } from "../interfaces/IUser"
+import { IUserWithId, IUserSchema } from "../interfaces/IUser"
 import { sendEmail } from "../utils/sendEmail"
 const crypto = require("crypto")
 const User = require("../schemas/User")
@@ -9,7 +9,11 @@ const asyncHandler = require("../middlewares/async")
 
 // Middleware for authentication; get token from model, save to cookie, and send response to server
 
-const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
+const sendTokenResponse = (
+  user: IUserWithId,
+  statusCode: number,
+  res: Response
+) => {
   // Generate token using User's Schema method
   const token = user.generateToken()
 
@@ -21,10 +25,19 @@ const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
     httpOnly: true,
   }
 
-  res.status(statusCode).cookie("token", token, options).json({
-    success: true,
-    token,
-  })
+  res
+    .status(statusCode)
+    .cookie("token", token, options)
+    .json({
+      success: true,
+      user: {
+        _id: user.id,
+        email: user.email,
+        username: user.username,
+        isEmailConfirmed: user.isEmailConfirmed,
+      },
+      token,
+    })
 }
 
 const sendConfirmEmail = async (req: Request, user: IUserSchema) => {
@@ -248,7 +261,7 @@ exports.forgotPassword = asyncHandler(
 exports.resetPassword = asyncHandler(
   async (req: Request, res: Response, _next: NextFunction) => {
     // Get new password from request
-    const newPassword = req.body.password
+    const newPassword = req.body.newPassword
 
     if (!newPassword) {
       res.status(404).json({
@@ -266,7 +279,6 @@ exports.resetPassword = asyncHandler(
       .digest("hex")
 
     // Find the user based on the token provided in the link
-    console.log(unhashedResetToken, hashedResetToken)
     const user = await User.findOne({
       resetPasswordToken: hashedResetToken,
       resetPasswordExpire: { $gt: Date.now() },
